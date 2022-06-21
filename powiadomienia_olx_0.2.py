@@ -25,7 +25,7 @@ import yagmail as yg
 sender = 'twoj_email@gmail.com'
 password = 'password' # Gmail app password. Lepiej przechowywać w innej formie niż string - do poprawy
 
-miasto = 'gdansk' # Jeżeli takie samo wyszukiwanie chcę się wykonać dla różnych miast to można ustalić jako zmienną
+miasto = 'warszawa' # Jeżeli takie samo wyszukiwanie chcę się wykonać dla różnych miast to można ustalić jako zmienną
 
 # Link do przeszukania (mieszkania, wynajem, tylko ze zdjęciami, 1000 <= cena <= 2600, umeblowane, od 35mkw, 1-3 pokoje)
 link = 'https://www.olx.pl/d/nieruchomosci/mieszkania/wynajem/' + miasto + '/?search%5Bphotos%5D=1&search%5Border%5D=created_at:desc&search%5Bfilter_float_price:from%5D=1000&search%5Bfilter_float_price:to%5D=2600&search%5Bfilter_enum_furniture%5D%5B0%5D=yes&search%5Bfilter_float_m:from%5D=35&search%5Bfilter_enum_rooms%5D%5B0%5D=two&search%5Bfilter_enum_rooms%5D%5B1%5D=three'
