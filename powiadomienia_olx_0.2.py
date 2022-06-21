@@ -28,7 +28,7 @@ password = 'password' # Gmail app password. Lepiej przechowywać w innej formie 
 miasto = 'gdansk' # Jeżeli takie samo wyszukiwanie chcę się wykonać dla różnych miast to można ustalić jako zmienną
 
 # Link do przeszukania (mieszkania, wynajem, tylko ze zdjęciami, 1000 <= cena <= 2600, umeblowane, od 35mkw, 1-3 pokoje)
-link = 'https://www.olx.pl/d/nieruchomosci/mieszkania/wynajem/' + miasto + '/?search%5Bphotos%5D=1&search%5Bfilter_float_price:from%5D=1000&search%5Bfilter_float_price:to%5D=2600&search%5Bfilter_enum_furniture%5D%5B0%5D=yes&search%5Bfilter_float_m:from%5D=35&search%5Bfilter_enum_rooms%5D%5B0%5D=two&search%5Bfilter_enum_rooms%5D%5B1%5D=three'
+link = 'https://www.olx.pl/d/nieruchomosci/mieszkania/wynajem/' + miasto + '/?search%5Bphotos%5D=1&search%5Border%5D=created_at:desc&search%5Bfilter_float_price:from%5D=1000&search%5Bfilter_float_price:to%5D=2600&search%5Bfilter_enum_furniture%5D%5B0%5D=yes&search%5Bfilter_float_m:from%5D=35&search%5Bfilter_enum_rooms%5D%5B0%5D=two&search%5Bfilter_enum_rooms%5D%5B1%5D=three'
 
 # Przygotowanie 'opakowań' do zbierania ogłoszeń - słownik i ramka danych do której każde ogłoszenie (zmienne w słowniku) będzie dopisywane
 ogloszenie_zmienne = ['czas_dodania_ogloszenia',
@@ -100,7 +100,9 @@ try:
                     tytul = ogloszenie.find_element(By.CLASS_NAME, 'css-v3vynn-Text.eu5v0x0').text.strip()
                     ogloszenie_dict_temp['tytul'] = tytul
                 except:
-                    pass
+                    print('tytul_error')
+                    error_message = traceback.format_exc()
+                    print(error_message)
     #             try:
     #                 cena = ogloszenie.find_element(By.CLASS_NAME, 'css-wpfvmn-Text.eu5v0x0').text.strip() # Nie wiem dlaczego ale przy opcji --headless, algorytm nie scrapuje ceny. Work-around, to scrapowanie ceny z otwartego ogłoszenia (dalej w kodzie)
     #                 ogloszenie_dict_temp['cena'] = cena
@@ -110,7 +112,9 @@ try:
                     powierzchnia = ogloszenie.find_element(By.CLASS_NAME, 'css-1bhbxl1-Text.eu5v0x0').text.strip()
                     ogloszenie_dict_temp['powierzchnia'] = powierzchnia
                 except:
-                    pass
+                    print('powierzchnia_error')
+                    error_message = traceback.format_exc()
+                    print(error_message)
                 
                 try:
                     klik = ogloszenie.find_element(By.CLASS_NAME, 'css-1bbgabe')
@@ -124,6 +128,9 @@ try:
                     
                     czy_olx = driver.title
                 except:
+                    print('klik_error')
+                    error_message = traceback.format_exc()
+                    print(error_message)                    
                     czy_olx = '' # Jeżeli kliknięcie nie wyjdzie, to załóż czy_olx = '', czyli kolejny if idzie od razu do else
 
                 if re.search("olx", czy_olx, re.IGNORECASE):
@@ -144,7 +151,9 @@ try:
                         cena = driver.find_element(By.CLASS_NAME, 'css-okktvh-Text.eu5v0x0').text.strip() # Scrap ceny z ogłoszenia jako work-around, jak wspomniane wcześniej
                         ogloszenie_dict_temp['cena'] = cena
                     except:
-                        pass
+                        print('elementy_ogloszenia_olx_error')
+                        error_message = traceback.format_exc()
+                        print(error_message)    
                     
                     wszystkie_ogloszenia = wszystkie_ogloszenia.append(ogloszenie_dict_temp, ignore_index=True)
                     print('Ogloszenie ' + str(counter) + ' dodano do listy')
@@ -179,7 +188,9 @@ try:
                         cena = soup.find("strong", class_ = "css-8qi9av eu6swcv19").text.strip() # Scrap ceny z ogłoszenia jako work-around, jak wspomniane wcześniej
                         ogloszenie_dict_temp['cena'] = cena
                     except:
-                        pass
+                        print('elementy_ogloszenia_otodom_error')
+                        error_message = traceback.format_exc()
+                        print(error_message) 
 
                     wszystkie_ogloszenia = wszystkie_ogloszenia.append(ogloszenie_dict_temp, ignore_index=True)
                     print('Ogloszenie ' + str(counter) + ' dodano do listy')
@@ -277,11 +288,14 @@ try:
         print('Mail wysłany')
         
     else:
-        'Brak nowych ogłoszeń'
+        print('Brak nowych ogłoszeń')
+        subject = 'Brak nowych ogłoszeń'
+        mail = yg.SMTP(user = sender, password = password)
+        mail.send(to = sender, subject = subject)
+        print('Mail wysłany')
 except:
     error_message = traceback.format_exc()
     body_mail = error_message
-    body_mail = body_mail.to_html(render_links = True)
     subject = 'powiadomienia_olx_failed'
     mail = yg.SMTP(user = sender, password = password)
     mail.send(to = sender, subject = subject, contents = body_mail)
